@@ -3,7 +3,7 @@
     <div class="jumbotron">
         <h1>Hello Laravel</h1>
         <p class="lead">
-            你现在所看到的是 <a href="https://laravel-china.org/laravel-tutorial/5.1">Laravel 入门教程</a> 的示例项目主页。
+            你现在所看到的是 <a target="_blank" href="https://laravel.com/">Laravel </a> 的简单的示例项目的主页。
         </p>
         <p>
             一切，将从这里开始。
