@@ -9,6 +9,7 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
 use Auth;
+use Mail;
 
 class UsersController extends Controller
 {
@@ -57,11 +58,15 @@ class UsersController extends Controller
         ]);
 
         // 用户注册成功后自动登录
-        Auth::login($user);
+//        Auth::login($user);
+        // 用户注册成功后发送邮件已激活账号
+        $this->sendEmailConfirmationTo($user);
         // 提示语，flash 第一个参数和 bootstrap 的类进行结合提示成功样式语句
-        session()->flash('success', '欢迎，您将在这里开启一段新的旅程~');
+//        session()->flash('success', '欢迎，您将在这里开启一段新的旅程~');
+        session()->flash('success', '验证邮件已发送到你的注册邮箱上，请注意查收。');
         // 跳转到用户详情页
-        return redirect()->route('users.show', [$user]);
+//        return redirect()->route('users.show', [$user]);
+        return redirect('/');
     }
 
     public function edit($id)
@@ -98,5 +103,32 @@ class UsersController extends Controller
         $user->delete();
         session()->flash('success', '成功删除用户！');
         return back();
+    }
+
+    protected function sendEmailConfirmationTo($user)
+    {
+        $view = 'emails.confirm';
+        $data = compact('user');
+        $from = 'jack.shi@keerle.net';
+        $name = 'Jack';
+        $to = $user->email;
+        $subject = "感谢注册 Sample 应用！请确认你的邮箱。";
+
+        Mail::send($view, $data, function ($message) use ($from, $name, $to, $subject) {
+            $message->from($from, $name)->to($to)->subject($subject);
+        });
+    }
+
+    public function confirmEmail($token)
+    {
+        $user = User::where('activation_token', $token)->firstOrFail();
+
+        $user->activated = true;
+        $user->activation_token = null;
+        $user->save();
+
+        Auth::login($user);
+        session()->flash('success', '恭喜您，激活成功！');
+        return redirect()->route('users.show', [$user]);
     }
 }
