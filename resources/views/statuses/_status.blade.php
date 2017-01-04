@@ -9,4 +9,11 @@
         {{$status->created_at->diffForHumans()}}
     </span>
     <span class="content">{{$status->content}}</span>
+    @can('destroy', $status)
+        <form action="{{route('statuses.destroy', $status->id)}}" method="post">
+            {{csrf_field()}}
+            {{method_field('DELETE')}}
+            <button type="submit" class="btn btn-danger btn-sm status-delete-btn">删除</button>
+        </form>
+    @endcan
 </li>
